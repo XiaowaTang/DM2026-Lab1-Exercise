@@ -65,6 +65,16 @@ def test_term_frequency_tool():
     assert result["status"] == "success"
     assert result["total_terms"] == 5
 
+    # Verify top_terms in summary
+    top_terms_map = {item["term"]: item["frequency"] for item in result["top_terms"]}
+    assert top_terms_map["always"] == 7
+    assert top_terms_map["gamma"] == 7
+
+    # Retrieve full_report from session.results_store to assert all frequencies
+    result_id = result["result_id"]
+    full_report = session.results_store[result_id]["full_report"]
+    report_map = dict(zip(full_report["term"], full_report["frequency"]))
+
     expected_frequencies = {
         "alpha": 6,
         "always": 7,
@@ -72,7 +82,7 @@ def test_term_frequency_tool():
         "delta": 4,
         "gamma": 7
     }
-    assert result["term_frequencies"] == expected_frequencies
+    assert report_map == expected_frequencies
 
 
 def test_dtm_heatmap_tool():

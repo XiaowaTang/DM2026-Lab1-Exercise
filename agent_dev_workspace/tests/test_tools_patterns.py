@@ -49,8 +49,8 @@ def test_mine_patterns_tool_fpgrowth_known_answer_17():
     })
     assert res_tfidf_catA["status"] == "success"
     assert res_tfidf_catA["n_patterns"] == 1
-    assert res_tfidf_catA["patterns"][0]["pattern"] == ["alpha"]
-    assert res_tfidf_catA["patterns"][0]["support"] == 3
+    assert res_tfidf_catA["top_patterns"][0]["pattern"] == ["alpha"]
+    assert res_tfidf_catA["top_patterns"][0]["support"] == 3
 
     # Case 4: filtering_method="tfidf", algorithm="fpgrowth", catB, min_sup=2
     res_tfidf_catB = mine_patterns_tool.invoke({
@@ -61,8 +61,8 @@ def test_mine_patterns_tool_fpgrowth_known_answer_17():
     })
     assert res_tfidf_catB["status"] == "success"
     assert res_tfidf_catB["n_patterns"] == 1
-    assert res_tfidf_catB["patterns"][0]["pattern"] == ["gamma"]
-    assert res_tfidf_catB["patterns"][0]["support"] == 4
+    assert res_tfidf_catB["top_patterns"][0]["pattern"] == ["gamma"]
+    assert res_tfidf_catB["top_patterns"][0]["support"] == 4
 
 
 def test_mine_patterns_tool_topk_and_maxfpgrowth_known_answer_20():
@@ -88,8 +88,8 @@ def test_mine_patterns_tool_topk_and_maxfpgrowth_known_answer_20():
     })
     assert res_topk_catA["status"] == "success"
     assert res_topk_catA["n_patterns"] == 1
-    assert res_topk_catA["patterns"][0]["pattern"] == ["alpha"]
-    assert res_topk_catA["patterns"][0]["support"] == 3
+    assert res_topk_catA["top_patterns"][0]["pattern"] == ["alpha"]
+    assert res_topk_catA["top_patterns"][0]["support"] == 3
 
     # Case 2: algorithm="topk", k=1, catB
     res_topk_catB = mine_patterns_tool.invoke({
@@ -100,8 +100,8 @@ def test_mine_patterns_tool_topk_and_maxfpgrowth_known_answer_20():
     })
     assert res_topk_catB["status"] == "success"
     assert res_topk_catB["n_patterns"] == 1
-    assert res_topk_catB["patterns"][0]["pattern"] == ["gamma"]
-    assert res_topk_catB["patterns"][0]["support"] == 4
+    assert res_topk_catB["top_patterns"][0]["pattern"] == ["gamma"]
+    assert res_topk_catB["top_patterns"][0]["support"] == 4
 
     # Case 3: algorithm="maxfpgrowth", min_sup=1 -> returns 0 patterns on single-term DB per PAMI design
     res_max_catA = mine_patterns_tool.invoke({

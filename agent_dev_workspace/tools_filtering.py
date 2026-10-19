@@ -21,7 +21,8 @@ def make_tools(session):
                 - initial_terms (int): Total number of terms before filtering.
                 - n_kept (int): Number of terms kept.
                 - n_removed (int): Number of terms removed.
-                - var_df (List[Dict[str, Any]]): List of dict records with 'feature', 'variance', and 'keep'.
+                - top_kept_features (List[str]): Sample list of up to top 10 kept features.
+                - top_removed_features (List[str]): Sample list of up to top 10 removed features.
         """
         if session.feature_matrix is None or session.feature_names is None:
             return {
@@ -48,8 +49,11 @@ def make_tools(session):
         # Per contract: full_report must have feature as 1st col, variance as 2nd col, sorted for visualization
         sorted_full_report = var_df.sort_values(by="variance", ascending=False).reset_index(drop=True)
 
-        n_kept = int(var_df["keep"].sum())
-        n_removed = len(var_df) - n_kept
+        kept_df = sorted_full_report[sorted_full_report["keep"]]
+        removed_df = sorted_full_report[~sorted_full_report["keep"]]
+
+        n_kept = len(kept_df)
+        n_removed = len(removed_df)
 
         summary = {
             "result_id": session.next_result_id("variance_filter"),
@@ -58,7 +62,8 @@ def make_tools(session):
             "initial_terms": len(session.feature_names),
             "n_kept": n_kept,
             "n_removed": n_removed,
-            "var_df": var_df.to_dict(orient="records")
+            "top_kept_features": kept_df["feature"].head(10).tolist(),
+            "top_removed_features": removed_df["feature"].head(10).tolist()
         }
 
         # store_result with sorted full_report dataframe matching contract requirement
@@ -78,7 +83,7 @@ def make_tools(session):
                 - status (str): 'success' or 'error'.
                 - target_class (str): The target class label used for correlation.
                 - n_terms (int): Total number of terms evaluated.
-                - correlation_df (List[Dict[str, Any]]): List of dict records with 'feature' and 'pearson_r'.
+                - top_correlated_features (List[Dict[str, Any]]): Top 10 terms with highest absolute Pearson correlation.
         """
         if session.feature_matrix is None or session.feature_names is None:
             return {
@@ -140,7 +145,7 @@ def make_tools(session):
             "status": "success",
             "target_class": target_class,
             "n_terms": len(session.feature_names),
-            "correlation_df": corr_df.to_dict(orient="records")
+            "top_correlated_features": sorted_full_report.head(10).to_dict(orient="records")
         }
 
         session.store_result("pearson_filter_tool", {"target_class": target_class}, summary, full_report=sorted_full_report)
@@ -159,7 +164,7 @@ def make_tools(session):
                 - status (str): 'success' or 'error'.
                 - target_class (str): The target class label used for correlation.
                 - n_terms (int): Total number of terms evaluated.
-                - correlation_df (List[Dict[str, Any]]): List of dict records with 'feature' and 'spearman_r'.
+                - top_correlated_features (List[Dict[str, Any]]): Top 10 terms with highest absolute Spearman correlation.
         """
         if session.feature_matrix is None or session.feature_names is None:
             return {
@@ -222,7 +227,7 @@ def make_tools(session):
             "status": "success",
             "target_class": target_class,
             "n_terms": len(session.feature_names),
-            "correlation_df": corr_df.to_dict(orient="records")
+            "top_correlated_features": sorted_full_report.head(10).to_dict(orient="records")
         }
 
         session.store_result("spearman_filter_tool", {"target_class": target_class}, summary, full_report=sorted_full_report)

@@ -31,9 +31,10 @@ def test_reduce_dimensions_pca_known_answer_7():
 
     assert result["status"] == "success"
     assert result["method"] == "pca"
+    assert result["n_documents"] == 8
     assert session.pending_figure is not None
 
-    coords = result["coordinates"]
+    coords = session.artifacts["reduced_coordinates"]
     assert len(coords) == 8
 
     # Expected PCA 2D coordinates from known answer #7
@@ -82,9 +83,10 @@ def test_reduce_dimensions_tsne_known_answer_8():
 
     assert result["status"] == "success"
     assert result["method"] == "tsne"
+    assert result["n_documents"] == 8
     assert session.pending_figure is not None
 
-    coords = result["coordinates"]
+    coords = session.artifacts["reduced_coordinates"]
     assert len(coords) == 8
 
 
@@ -114,9 +116,10 @@ def test_reduce_dimensions_umap_known_answer_9():
 
     assert result["status"] == "success"
     assert result["method"] == "umap"
+    assert result["n_documents"] == 8
     assert session.pending_figure is not None
 
-    coords = result["coordinates"]
+    coords = session.artifacts["reduced_coordinates"]
     assert len(coords) == 8
 
     # Expected UMAP coordinates from known answer #9 (n_neighbors=3, random_state=42)

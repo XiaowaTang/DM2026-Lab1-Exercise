@@ -32,7 +32,8 @@ def make_tools(session):
                 - result_id (str): Unique result identifier.
                 - status (str): 'success' or 'error'.
                 - method (str): Dimensionality reduction method used.
-                - coordinates (List[List[float]]): Reduced n_componentsD coordinates per document.
+                - n_documents (int): Total number of documents reduced.
+                - sample_coordinates (List[List[float]]): Sample reduced coordinates for first 10 documents.
                 - explained_variance_ratio (Optional[List[float]]): Variance ratio explained (PCA only).
         """
         if session.feature_matrix is None:
@@ -99,14 +100,17 @@ def make_tools(session):
         # Set mandatory pending figure on session
         session.pending_figure = fig
 
-        # Save artifacts and summary
+        # Save artifacts and full report dataframe
         session.artifacts["reduced_coordinates"] = coords_list
+        coords_df = pd.DataFrame(coords_list, columns=[f"Dim{i+1}" for i in range(n_components)])
+        coords_df["category"] = labels
 
         summary = {
             "result_id": session.next_result_id("reduce_dimensions"),
             "status": "success",
             "method": method_clean,
-            "coordinates": coords_list,
+            "n_documents": len(coords_list),
+            "sample_coordinates": coords_list[:10],
             "explained_variance_ratio": explained_variance_ratio
         }
 
@@ -119,7 +123,8 @@ def make_tools(session):
                 "n_neighbors": n_neighbors,
                 "random_state": random_state
             },
-            summary
+            summary,
+            full_report=coords_df
         )
         return summary
 

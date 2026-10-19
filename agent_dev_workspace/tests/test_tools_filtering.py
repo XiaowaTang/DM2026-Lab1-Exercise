@@ -30,14 +30,22 @@ def test_variance_filter_tool():
     # 4. Invoke variance_filter_tool with threshold=0.15
     result = variance_filter_tool.invoke({"threshold": 0.15})
 
-    # 5. Assertions based on known answer #5 in TEST_FIXTURE.md
+    # 5. Assertions based on summary result
     assert result["status"] == "success"
     assert result["initial_terms"] == 5
     assert result["n_kept"] == 4
     assert result["n_removed"] == 1
+    assert "always" in result["top_removed_features"]
+    assert set(result["top_kept_features"]) == {"alpha", "beta", "delta", "gamma"}
 
-    # Extract var_df records into a lookup map
-    var_map = {row["feature"]: (row["variance"], row["keep"]) for row in result["var_df"]}
+    # 6. Retrieve full_report stored in session.results_store to verify specific variances
+    result_id = result["result_id"]
+    full_report = session.results_store[result_id]["full_report"]
+    assert full_report.columns[0] == "feature"
+    assert full_report.columns[1] == "variance"
+
+    # Extract full report records into a lookup map
+    var_map = {row["feature"]: (row["variance"], row["keep"]) for _, row in full_report.iterrows()}
 
     # Known answer #5 expected variances and keep indicators for threshold=0.15
     assert var_map["alpha"][0] == pytest.approx(1.1875, abs=1e-3)
@@ -85,7 +93,16 @@ def test_pearson_filter_tool():
     assert result["target_class"] == "catB"
     assert result["n_terms"] == 5
 
-    corr_map = {row["feature"]: row["pearson_r"] for row in result["correlation_df"]}
+    # Check top_correlated_features in summary
+    assert len(result["top_correlated_features"]) == 5
+
+    # Check full_report stored in results_store
+    result_id = result["result_id"]
+    full_report = session.results_store[result_id]["full_report"]
+    assert full_report.columns[0] == "feature"
+    assert full_report.columns[1] == "pearson_r"
+
+    corr_map = {row["feature"]: row["pearson_r"] for _, row in full_report.iterrows()}
 
     # Known answer #6 Pearson r values for catB target
     assert corr_map["alpha"] == pytest.approx(-0.6882, abs=1e-3)
@@ -93,12 +110,6 @@ def test_pearson_filter_tool():
     assert corr_map["beta"] == pytest.approx(-0.7746, abs=1e-3)
     assert corr_map["delta"] == pytest.approx(1.0000, abs=1e-3)
     assert corr_map["gamma"] == pytest.approx(0.8307, abs=1e-3)
-
-    # Check full_report stored in results_store
-    result_id = result["result_id"]
-    full_report = session.results_store[result_id]["full_report"]
-    assert full_report.columns[0] == "feature"
-    assert full_report.columns[1] == "pearson_r"
     
     # Verify sorted by absolute correlation descending (|pearson_r|)
     abs_corrs = full_report["pearson_r"].abs().tolist()
@@ -134,7 +145,16 @@ def test_spearman_filter_tool():
     assert result["target_class"] == "catB"
     assert result["n_terms"] == 5
 
-    corr_map = {row["feature"]: row["spearman_r"] for row in result["correlation_df"]}
+    # Check top_correlated_features in summary
+    assert len(result["top_correlated_features"]) == 5
+
+    # Check full_report stored in results_store
+    result_id = result["result_id"]
+    full_report = session.results_store[result_id]["full_report"]
+    assert full_report.columns[0] == "feature"
+    assert full_report.columns[1] == "spearman_r"
+
+    corr_map = {row["feature"]: row["spearman_r"] for _, row in full_report.iterrows()}
 
     # Known answer #6 Spearman r values for catB target
     assert corr_map["alpha"] == pytest.approx(-0.7500, abs=1e-3)
@@ -142,12 +162,6 @@ def test_spearman_filter_tool():
     assert corr_map["beta"] == pytest.approx(-0.7746, abs=1e-3)
     assert corr_map["delta"] == pytest.approx(1.0000, abs=1e-3)
     assert corr_map["gamma"] == pytest.approx(0.9363, abs=1e-3)
-
-    # Check full_report stored in results_store
-    result_id = result["result_id"]
-    full_report = session.results_store[result_id]["full_report"]
-    assert full_report.columns[0] == "feature"
-    assert full_report.columns[1] == "spearman_r"
 
     # Verify sorted by absolute correlation descending (|spearman_r|)
     abs_corrs = full_report["spearman_r"].abs().tolist()

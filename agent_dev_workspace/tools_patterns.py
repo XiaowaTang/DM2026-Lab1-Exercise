@@ -41,7 +41,7 @@ def make_tools(session):
                 - filtering_method (str): The filtering approach used.
                 - algorithm (str): Mining algorithm used.
                 - n_patterns (int): Total number of mined patterns.
-                - patterns (List[Dict[str, Any]]): List of dicts with 'pattern' (List[str]) and 'support' (int).
+                - top_patterns (List[Dict[str, Any]]): Top 10 patterns with 'pattern' (List[str]) and 'support' (int).
                 - note (Optional[str]): Message if no terms or patterns survived.
         """
         if session.dataframe is None:
@@ -78,7 +78,7 @@ def make_tools(session):
                 "filtering_method": filtering_method,
                 "algorithm": algorithm,
                 "n_patterns": 0,
-                "patterns": [],
+                "top_patterns": [],
                 "note": "no terms survived English stopword removal"
             }
 
@@ -93,7 +93,7 @@ def make_tools(session):
                 "filtering_method": filtering_method,
                 "algorithm": algorithm,
                 "n_patterns": 0,
-                "patterns": [],
+                "top_patterns": [],
                 "note": "no terms survived filtering"
             }
 
@@ -132,7 +132,7 @@ def make_tools(session):
                 "filtering_method": filtering_method,
                 "algorithm": algorithm,
                 "n_patterns": 0,
-                "patterns": [],
+                "top_patterns": [],
                 "note": "no terms survived filtering"
             }
             session.artifacts[f"patterns_{category_name}_{filtering_method}_{algorithm}"] = []
@@ -207,6 +207,8 @@ def make_tools(session):
         artifact_key = f"patterns_{category_name}_{filtering_method}_{algorithm}"
         session.artifacts[artifact_key] = patterns
 
+        report_df = pd.DataFrame(patterns) if patterns else pd.DataFrame(columns=["pattern", "support"])
+
         summary = {
             "result_id": session.next_result_id("mine_patterns"),
             "status": "success",
@@ -214,7 +216,7 @@ def make_tools(session):
             "filtering_method": filtering_method,
             "algorithm": algorithm,
             "n_patterns": len(patterns),
-            "patterns": patterns,
+            "top_patterns": patterns[:10],
             "note": "no patterns found" if len(patterns) == 0 else None
         }
 
@@ -227,7 +229,8 @@ def make_tools(session):
                 "min_sup": min_sup,
                 "k": k
             },
-            summary
+            summary,
+            full_report=report_df
         )
         return summary
 

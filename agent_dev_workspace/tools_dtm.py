@@ -68,8 +68,7 @@ def make_tools(session):
                 - result_id (str): Unique result identifier.
                 - status (str): 'success' or 'error'.
                 - total_terms (int): Total number of terms in vocabulary.
-                - term_frequencies (Dict[str, int]): Dictionary mapping each term to its total count.
-                - top_terms (List[Dict[str, Any]]): Top terms sorted by frequency descending.
+                - top_terms (List[Dict[str, Any]]): Top 10 terms sorted by frequency descending.
         """
         if session.feature_matrix is None or session.feature_names is None:
             return {
@@ -92,7 +91,6 @@ def make_tools(session):
             "result_id": session.next_result_id("term_freq"),
             "status": "success",
             "total_terms": len(session.feature_names),
-            "term_frequencies": term_frequencies,
             "top_terms": top_terms[:10]
         }
 
