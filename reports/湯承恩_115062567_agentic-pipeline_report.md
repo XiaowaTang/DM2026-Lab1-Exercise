@@ -7,9 +7,7 @@ I do some data mining on the dataset "20-newsgroups", which contains articles th
 
 ![describe result](../plots/湯承恩_agentic-pipeline_plot_describe_7.png)
 
-At the beginning, I build document-term matrix for the further application. By applying cosine_similarity_tool for different pairs of data, we can see that the cosine similarity for same-category pair(0.36 for Doc 0 vs Doc 2) is higher than different-category pair(0.26 for Doc 0 vs Doc 2).
-
-Next, I inspect feature correlation matrix to see how terms with highest variance correlate with each other, below shows the result. It is evident that many of the words with the highest variance are stop-words that carry meaningless information. This is to be expected, as I did not remove them when constructing the document-term matrix. Nevertheless, the matrix still yields some useful insights: for instance, we can observe a high correlation coefficient (0.62) between the terms "jpeg" and "image", a value much higher than the correlation of "jpeg" with stop words such as "the" (0.30). This is likely due to the fact that they frequently appear together in articles within the "comp.graphics" category.
+First, I inspect feature correlation matrix to see how terms with highest variance correlate with each other, below shows the result. It is evident that many of the words with the highest variance are stop-words that carry meaningless information. This is to be expected, as I did not remove them when constructing the document-term matrix. Nevertheless, the matrix still yields some useful insights: for instance, we can observe a high correlation coefficient (0.62) between the terms "jpeg" and "image", a value much higher than the correlation of "jpeg" with stop words such as "the" (0.30). This is likely due to the fact that they frequently appear together in articles within the "comp.graphics" category.
 
 ![feat_corr result](../plots/湯承恩_agentic-pipeline_plot_feat_corr_15.png)
 
